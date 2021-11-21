@@ -1,0 +1,5 @@
+lnd:
+  credentials_path: 'Path to credential file like $LND_HOME/tls.cert.'
+  macaroon_path: 'Path to the macaroon file created by lnd like $LND_HOME/data/chain/bitcoin/mainnet/admin.macaroon'
+  host: 'lnd host'
+  port: 10009 # gRPC port

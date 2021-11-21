@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'lnd/tool'
+require 'thor'
+require 'yaml'
+
+class CLI < Thor
+
+  class << self
+    def exit_on_failure?
+      true
+    end
+  end
+
+  desc 'capture_htlc --config "Path to configuration file"', 'Capture the HTLC events of LND.'
+  option :config, required: true, type: :string
+  def capture_htlc
+    raise Thor::Error, "config file #{options['config']} does not exist." unless File.exist?(options['config'])
+    config = YAML.load_file(options['config'])
+  end
+
+end
+
+CLI.start(ARGV)
