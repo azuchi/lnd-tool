@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency 'lnrpc', '~> 0.13.0'
+  spec.add_dependency 'sqlite3', '~> 1.4.2'
   spec.add_dependency 'thor', '~> 1.1.0'
 
   spec.add_development_dependency 'rspec', '~> 3.0'
