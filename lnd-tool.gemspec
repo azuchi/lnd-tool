@@ -4,7 +4,7 @@ require_relative 'lib/lnd/tool/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'lnd-tool'
-  spec.version       = Lnd::Tool::VERSION
+  spec.version       = LND::Tool::VERSION
   spec.authors       = ['azuchi']
   spec.email         = ['azuchi@chaintope.com']
 
@@ -28,8 +28,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency 'thor', '~> 1.1.0'
   spec.add_dependency 'lnrpc', '~> 0.13.0'
+  spec.add_dependency 'thor', '~> 1.1.0'
 
   spec.add_development_dependency 'rspec', '~> 3.0'
 

@@ -4,6 +4,7 @@ require 'lnd/tool'
 require 'thor'
 require 'yaml'
 
+# CLI class of lnd-tool
 class CLI < Thor
 
   class << self
@@ -16,7 +17,20 @@ class CLI < Thor
   option :config, required: true, type: :string
   def capture_htlc
     raise Thor::Error, "config file #{options['config']} does not exist." unless File.exist?(options['config'])
+    raise Thor::Error, 'Capture process already running.' if LND::Tool::Daemon.running?
+
     config = YAML.load_file(options['config'])
+    LND::Tool::Daemon.start do
+      capture = LND::Tool::HTLCEventCapture.new(config['lnd'])
+      capture.start
+    end
+  end
+
+  desc 'stop_capture', 'Stop capture process.'
+  def stop_capture
+    raise Thor::Error, 'Capture process not running.' unless LND::Tool::Daemon.running?
+
+    LND::Tool::Daemon.stop
   end
 
 end
