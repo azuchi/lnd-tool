@@ -9,6 +9,7 @@ module LND
     # Your code goes here...
 
     autoload :Daemon, 'lnd/tool/daemon'
+    autoload :Store, 'lnd/tool/store'
     autoload :HTLCEventCapture, 'lnd/tool/htlc_event_capture'
 
   end

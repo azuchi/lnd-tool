@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'lnd/tool'
+require "tmpdir"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -13,3 +14,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+def random_db_path
+  Pathname.new(File.expand_path("#{Dir.tmpdir}/lnd-tool-#{rand(10_000)}")).to_s
+end
+
