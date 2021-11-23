@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'lnd-tool'
   spec.version       = LND::Tool::VERSION
   spec.authors       = ['azuchi']
-  spec.email         = ['azuchi@chaintope.com']
+  spec.email         = ['techmedia.think@gmail.com']
 
   spec.summary       = 'LND Tool - Ruby tools for LND'
   spec.description   = 'LND Tool - Ruby tools for LND'
