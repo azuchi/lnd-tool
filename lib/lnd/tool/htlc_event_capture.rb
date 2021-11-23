@@ -16,8 +16,10 @@ module LND
 
       # Start capture.
       def start
-        client.router.subscribe_htlc_events.each do |response|
-          puts response
+        store = Store::HTLCEvent.new
+        client.router.subscribe_htlc_events.each do |htlc_event|
+          puts htlc_event
+          store.save(htlc_event)
         end
       end
 

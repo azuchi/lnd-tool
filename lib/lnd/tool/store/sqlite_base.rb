@@ -8,8 +8,10 @@ module LND
 
         attr_reader :db
 
-        def initialize(path)
-          @db = SQLite3::Database.new(path)
+        # Initialize data store.
+        # @param [Pathname] path data base path.
+        def initialize(path = Daemon.db_path)
+          @db = SQLite3::Database.new(path.to_s)
           setup
         end
 
