@@ -3,6 +3,7 @@
 require 'lnd/tool'
 require 'thor'
 require 'yaml'
+require 'terminal-table'
 
 # CLI class of lnd-tool
 class CLI < Thor
@@ -31,6 +32,55 @@ class CLI < Thor
     raise Thor::Error, 'Capture process not running.' unless LND::Tool::Daemon.running?
 
     LND::Tool::Daemon.stop
+  end
+
+  desc 'query_htlc', 'Query the captured data in SQLite DB.'
+  option :event, type: :string,
+                 desc: 'Targets the specified type of event. Valid type are "send", "receive", "forward".'
+  option :limit, type: :numeric, desc: 'Maximum number of data'
+  def query_htlc
+    if options['event'] && !%w[send receive forward].include?(options['event'])
+      raise Thor::Error, 'event must be specified as send, receive, or forward.'
+    end
+
+    headers = [
+      'incoming channel',
+      'incoming htlc',
+      'outgoing channel',
+      'outgoing htlc',
+      'timestamp',
+      'event type',
+      'result',
+      'detail',
+      'incoming msat',
+      'outgoing msat'
+    ]
+    store = LND::Tool::Store::HTLCEvent.new
+    rows = store.query(event_type: options['event']&.upcase, limit: options['limit']).map do |r|
+      result, detail, htlc = if r.forward_event
+                               ['FORWARD', nil, r.forward_event.info]
+                             elsif r.forward_fail_event
+                               ['FORWARD FAIL']
+                             elsif r.settle_event
+                               ['SETTLE']
+                             elsif r.link_fail_event
+                               ['LINK_FAIL', r.link_fail_event.wire_failure, r.link_fail_event.info]
+                             end
+      [
+        { value: r.incoming_channel_id, alignment: :right },
+        { value: r.incoming_htlc_id, alignment: :right },
+        { value: r.outgoing_channel_id, alignment: :right },
+        { value: r.outgoing_htlc_id, alignment: :right },
+        Time.at(r.timestamp_ns / 1000000000),
+        r.event_type,
+        result,
+        detail,
+        { value: htlc&.incoming_amt_msat, alignment: :right },
+        { value: htlc&.outgoing_amt_msat, alignment: :right }
+      ]
+    end
+    table = Terminal::Table.new(title: 'HTLC Events', headings: headers, rows: rows)
+    puts table
   end
 
 end

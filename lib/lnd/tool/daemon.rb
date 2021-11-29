@@ -47,7 +47,7 @@ module LND
       end
 
       # Start block program as daemon.
-      def start()
+      def start
         base_dir.mkdir unless base_dir.exist?
         raise LND::Tool::Error, "process(#{pid_path.read.to_i}) already running." if running?
 

@@ -55,7 +55,35 @@ module LND
             incoming_htlc_id, outgoing_htlc_id, timestamp_ns, event_type, forward_event, forward_fail_event,
             settle_event, link_fail_event FROM HtlcEvent ORDER BY created_datetime DESC
           SQL
-          db.query(query).lazy.map do |result|
+          convert(db.query(query))
+        end
+
+        # @param [String] event_type event type condition
+        # @param [Integer] limit limit for return value
+        # @return [Array]
+        def query(event_type: nil, limit: nil)
+          query = <<~SQL
+            SELECT incoming_channel_id, outgoing_channel_id,
+            incoming_htlc_id, outgoing_htlc_id, timestamp_ns, event_type, forward_event, forward_fail_event,
+            settle_event, link_fail_event FROM HtlcEvent
+          SQL
+          bind = []
+          if event_type
+            query << ' WHERE event_type = ?'
+            bind << event_type
+          end
+          query << ' ORDER BY created_datetime DESC'
+          if limit
+            query << ' LIMIT ?'
+            bind << limit
+          end
+          convert(db.query(query, bind))
+        end
+
+        private
+
+        def convert(recode_sets)
+          recode_sets.lazy.map do |result|
             forward_event = result[6] ? Routerrpc::ForwardEvent.decode_json(result[6]) : nil
             forward_fail_event = result[7] ? Routerrpc::ForwardFailEvent.decode_json(result[7]) : nil
             settle_event = result[8] ? Routerrpc::SettleEvent.decode_json(result[8]) : nil

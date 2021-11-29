@@ -62,3 +62,25 @@ If you stop the capturing, run following command:
 
     $ lnd-tool stop_capture
 
+### Search HTLC events
+
+You can use the `query_htlc` command to retrieve the data of HTLC events stored in SQLite3.
+Since it is a search to the database, it can be run even if the capture process is not running.
+
+    $ lnd-tool query_htlc
+    +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    |                                                                                    HTLC Events                                                                                     |
+    +--------------------+---------------+--------------------+---------------+---------------------------+------------+--------------+------------------+---------------+---------------+
+    | incoming channel   | incoming htlc | outgoing channel   | outgoing htlc | timestamp                 | event type | result       | detail           | incoming msat | outgoing msat |
+    +--------------------+---------------+--------------------+---------------+---------------------------+------------+--------------+------------------+---------------+---------------+
+    | 759077539161571329 |           259 | 781080965883559937 |             0 | 2021-11-29 13:29:57 +0900 | FORWARD    | LINK_FAIL    | FEE_INSUFFICIENT |      75002825 |      75001075 |
+    | 759526139822866433 |            32 | 759077539161571329 |           441 | 2021-11-25 16:34:48 +0900 | FORWARD    | FORWARD FAIL |                  |               |               |
+    | 759526139822866433 |            32 | 759077539161571329 |           441 | 2021-11-25 16:34:44 +0900 | FORWARD    | FORWARD      |                  |     100050900 |     100000000 |
+    | 759526139822866433 |            31 | 759077539161571329 |           440 | 2021-11-25 16:34:39 +0900 | FORWARD    | FORWARD FAIL |                  |               |               |
+    | 759526139822866433 |            31 | 759077539161571329 |           440 | 2021-11-25 16:34:36 +0900 | FORWARD    | FORWARD      |                  |         11005 |         10000 |
+    +--------------------+---------------+--------------------+---------------+---------------------------+------------+--------------+------------------+---------------+---------------+
+
+The `query_htlc` command has the following options.
+
+* `event`: Option to specify the event type(`send`, `receive`, `forward`). e.g. `$ lnd-tool query_htlc --event=forward`
+* `limit`: Option to narrows down the number of data. e.g. `$lnd-tool query_htlc --limit=30`
