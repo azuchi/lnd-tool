@@ -83,6 +83,26 @@ class CLI < Thor
     puts table
   end
 
+  desc 'prune_htlc', 'Pruning the data for the HTLC event in DB. Run with either the max option or the date option.'
+  option :max, type: :numeric, desc:
+    'This is the maximum number of data to be kept. Data exceeding this limit will be deleted in order of oldest to newest.'
+  option :date, type: :string, desc: 'Date in 2021-09-04 format. Delete data prior to this date.'
+  def prune_htlc
+    begin
+      store = LND::Tool::Store::HTLCEvent.new
+      if options['max']
+        store.prune_up_to(options['max'])
+      elsif options['date']
+        time = Date.parse(options['date']).to_time
+        store.prune_prior_to(time)
+      else
+        raise Thor::Error, 'Either the max or date option should be specified.'
+      end
+      puts "The current number of data is #{store.count}."
+    rescue Date::Error
+      raise Thor::Error, 'The format of the date option is invalid.'
+    end
+  end
 end
 
 CLI.start(ARGV)
