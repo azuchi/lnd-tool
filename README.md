@@ -1,4 +1,4 @@
-# LND::Tool [![Build Status](https://github.com/azuchi/lnd-tool/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/azuchi/lnd-tool/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/lnd-tool.svg)](https://badge.fury.io/rb/lnd-tool) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+# LND::Tool [![Build Status](https://github.com/azuchi/lnd-tool/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/azuchi/lnd-tool/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/lnd-tool.svg)](https://badge.fury.io/rb/lnd-tool) [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.txt)
 
 This is a tool for LND written in Ruby. Subscribe to htlc events in LND and save their contents to SQLite3.
 
@@ -84,3 +84,14 @@ The `query_htlc` command has the following options.
 
 * `event`: Option to specify the event type(`send`, `receive`, `forward`). e.g. `$ lnd-tool query_htlc --event=forward`
 * `limit`: Option to narrows down the number of data. e.g. `$lnd-tool query_htlc --limit=30`
+
+### Prune HTLC events
+
+When the capture is running, the HTLC event is stored in the DB and the size of the DB grows.
+Since v0.3.0, the `prune_htlc` command to prune(delete) DB records has been added.
+
+The `prune_htlc` command should be executed with one of the following options:
+
+* `max`: This is the maximum number of events to be retained in the DB. 
+Data exceeding this number will be pruned from the oldest data. (e.g.`$lnd-tool prune_htlc --max 10000`)
+* `date`: Delete data prior to this date. (e.g.`prune_htlc --date 2021-11-24`)
