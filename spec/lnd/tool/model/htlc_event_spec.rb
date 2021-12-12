@@ -41,6 +41,7 @@ RSpec.describe LND::Tool::Store::HTLCEvent do
       expect(results[0].event_type).to eq(:FORWARD)
       expect(results[0].link_fail_event.wire_failure).to eq(:UNKNOWN_NEXT_PEER)
       expect(results[1].link_fail_event.wire_failure).to eq(:TEMPORARY_CHANNEL_FAILURE)
+      expect(store.count).to eq(2)
     end
   end
 
@@ -55,7 +56,21 @@ RSpec.describe LND::Tool::Store::HTLCEvent do
       expect(send.size).to eq(1)
       expect(send.first.event_type).to eq(:SEND)
       expect(store.query(limit: 1).to_a.size).to eq(1)
+      expect(store.count).to eq(3)
     end
   end
 
+  describe '#prune_up_to' do
+    it 'should return pruning count' do
+      store = LND::Tool::Store::HTLCEvent.new(random_db_path)
+      store.save(insufficient_error)
+      store.save(unknown_next_peer_error)
+      store.save(send_data)
+      expect(store.prune_up_to(3)).to eq(0)
+      expect(store.count).to eq(3)
+      expect(store.prune_up_to(1)).to eq(2)
+      expect(store.count).to eq(1)
+      expect(store.all.first.event_type).to eq(:SEND)
+    end
+  end
 end

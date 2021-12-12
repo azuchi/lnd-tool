@@ -86,6 +86,18 @@ module LND
           db.get_first_value('SELECT count(*) FROM HtlcEvent').to_i
         end
 
+        # Pruning record up to +max+.
+        # @param [Integer] max Maximum number of records for this entity.
+        # @return [Integer] pruning count
+        def prune_up_to(max)
+          pruning_count = count - max
+          return 0 if pruning_count <= 0
+
+          query = 'DELETE FROM HtlcEvent ORDER BY created_datetime ASC LIMIT ?'
+          db.execute(query, [pruning_count])
+          pruning_count
+        end
+
         private
 
         def convert(recode_sets)
