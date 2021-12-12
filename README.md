@@ -94,4 +94,4 @@ The `prune_htlc` command should be executed with one of the following options:
 
 * `max`: This is the maximum number of events to be retained in the DB. 
 Data exceeding this number will be pruned from the oldest data. (e.g.`$lnd-tool prune_htlc --max 10000`)
-* `date`: Delete data prior to this date. (e.g.`prune_htlc --date 2021-11-24`)
+* `date`: Delete data prior to this date. (e.g.`$lnd-tool prune_htlc --date 2021-11-24`)
