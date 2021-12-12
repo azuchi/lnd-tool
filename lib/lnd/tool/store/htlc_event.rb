@@ -80,6 +80,12 @@ module LND
           convert(db.query(query, bind))
         end
 
+        # Get record count.
+        # @return [Integer] record count.
+        def count
+          db.get_first_value('SELECT count(*) FROM HtlcEvent').to_i
+        end
+
         private
 
         def convert(recode_sets)
