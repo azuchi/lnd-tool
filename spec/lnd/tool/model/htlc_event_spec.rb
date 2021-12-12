@@ -11,7 +11,7 @@ RSpec.describe LND::Tool::Store::HTLCEvent do
                                               failure_detail: :INSUFFICIENT_BALANCE,
                                               failure_string: 'insufficient bandwidth to route htlc')
     Routerrpc::HtlcEvent.new(incoming_channel_id: 759_077_539_161_571_329, outgoing_channel_id: 781_080_965_883_559_937,
-                             incoming_htlc_id: 181, outgoing_htlc_id: 0, timestamp_ns: 1_637_590_236_680_277_182,
+                             incoming_htlc_id: 181, outgoing_htlc_id: 0, timestamp_ns: 1_637_590_236_680_277_182, # 2021-11-22 23:10:36 +0900
                              event_type: :FORWARD, link_fail_event: fail_event)
   end
   let(:unknown_next_peer_error) do
@@ -21,12 +21,12 @@ RSpec.describe LND::Tool::Store::HTLCEvent do
                                               failure_detail: :NO_DETAIL,
                                               failure_string: 'UnknownNextPeer')
     Routerrpc::HtlcEvent.new(incoming_channel_id: 781_080_965_883_559_937, outgoing_channel_id: 759_526_139_822_866_433,
-                             incoming_htlc_id: 1, outgoing_htlc_id: 0, timestamp_ns: 1_637_607_169_647_344_635,
+                             incoming_htlc_id: 1, outgoing_htlc_id: 0, timestamp_ns: 1_637_607_169_647_344_635, # 2021-11-23 03:52:49 +0900
                              event_type: :FORWARD, link_fail_event: fail_event)
   end
   let(:send_data) do
     Routerrpc::HtlcEvent.new(incoming_channel_id: 781_080_965_883_559_937, outgoing_channel_id: 759_526_139_822_866_433,
-                             incoming_htlc_id: 1, outgoing_htlc_id: 0, timestamp_ns: 1_637_607_169_647_344_635,
+                             incoming_htlc_id: 1, outgoing_htlc_id: 0, timestamp_ns: 1_637_693_569_647_344_635, # 2021-11-24 03:52:49 +0900
                              event_type: :SEND, settle_event: Routerrpc::SettleEvent.new)
   end
 
@@ -61,7 +61,7 @@ RSpec.describe LND::Tool::Store::HTLCEvent do
   end
 
   describe '#prune_up_to' do
-    it 'should return pruning count' do
+    it 'should prune record' do
       store = LND::Tool::Store::HTLCEvent.new(random_db_path)
       store.save(insufficient_error)
       store.save(unknown_next_peer_error)
@@ -69,6 +69,18 @@ RSpec.describe LND::Tool::Store::HTLCEvent do
       expect(store.prune_up_to(3)).to eq(0)
       expect(store.count).to eq(3)
       expect(store.prune_up_to(1)).to eq(2)
+      expect(store.count).to eq(1)
+      expect(store.all.first.event_type).to eq(:SEND)
+    end
+  end
+
+  describe 'prune_prior_to' do
+    it 'should prune record' do
+      store = LND::Tool::Store::HTLCEvent.new(random_db_path)
+      store.save(insufficient_error)
+      store.save(unknown_next_peer_error)
+      store.save(send_data)
+      store.prune_prior_to(Time.at(1_637_607_229)) # 2021-11-23 03:53:49 +0900
       expect(store.count).to eq(1)
       expect(store.all.first.event_type).to eq(:SEND)
     end

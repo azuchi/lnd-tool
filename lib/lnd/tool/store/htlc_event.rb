@@ -98,6 +98,13 @@ module LND
           pruning_count
         end
 
+        # Pruning record prior to +Time+.
+        # @param [Time] time
+        def prune_prior_to(time)
+          query = 'DELETE FROM HtlcEvent WHERE timestamp_ns < ?'
+          db.execute(query, [time.to_i * 1_000_000_000])
+        end
+
         private
 
         def convert(recode_sets)

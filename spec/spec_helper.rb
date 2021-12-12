@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'lnd/tool'
-require "tmpdir"
+require 'tmpdir'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
