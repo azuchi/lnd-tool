@@ -15,12 +15,15 @@ class CLI < Thor
   end
 
   desc 'capture_htlc --config "Path to configuration file"', 'Capture the HTLC events of LND.'
-  option :config, required: true, type: :string
+  option :config, type: :string, desc: 'Path to configuration file. If not specified, use $HOME/.lnd-tool/config.yml.'
   def capture_htlc
-    raise Thor::Error, "config file #{options['config']} does not exist." unless File.exist?(options['config'])
+    config_path = options['config'] || "#{ENV['HOME']}/.lnd-tool/config.yml"
+    raise Thor::Error, "config file #{config_path} does not exist." unless File.exist?(config_path)
     raise Thor::Error, 'Capture process already running.' if LND::Tool::Daemon.running?
 
-    config = YAML.load_file(options['config'])
+    config = YAML.load_file(config_path)
+    puts "Load #{config_path}."
+    puts 'Start capture daemon.'
     LND::Tool::Daemon.start do
       capture = LND::Tool::HTLCEventCapture.new(config['lnd'])
       capture.start
